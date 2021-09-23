@@ -62,10 +62,14 @@ namespace WebApi.Controllers
                     SqlCommand cmd = new SqlCommand
                     {
                         Connection = connection,
-                        CommandType = CommandType.Text,
+                        CommandType = CommandType.StoredProcedure,
                         CommandTimeout = 0,
-                        CommandText = "insert into registraion select "
+                        CommandText = "saveUserData"
                     };
+                    cmd.Parameters.AddWithValue("@Username", "kml");
+                    cmd.Parameters.AddWithValue("@Password", "kml123");
+                    cmd.Parameters.AddWithValue("@EmailAddress", "kml@gmail.com");
+                    cmd.Parameters.AddWithValue("@PhoneNumber", "908080");
                     SqlDataAdapter sda = new SqlDataAdapter
                     {
                         SelectCommand = cmd
