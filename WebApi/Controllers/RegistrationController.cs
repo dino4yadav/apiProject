@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Cors;
+using WebApi.Models;
 
 namespace WebApi.Controllers
 {
@@ -48,10 +48,44 @@ namespace WebApi.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("api/CheckUserNameAndPassword")]
+        public HttpResponseMessage CheckUserNameAndPassword([FromBody] UserProfileData userProfileData)
+        {
+            DataSet dt = new DataSet();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    SqlCommand cmd = new SqlCommand
+                    {
+                        Connection = connection,
+                        CommandType = CommandType.StoredProcedure,
+                        CommandTimeout = 0,
+                        CommandText = "checkUserAndPassword"
+                    };
+                    cmd.Parameters.AddWithValue("@userName", userProfileData.UserName);
+                    cmd.Parameters.AddWithValue("@password", userProfileData.Password);
+                    SqlDataAdapter sda = new SqlDataAdapter
+                    {
+                        SelectCommand = cmd
+                    };
+                    sda.Fill(dt);
+                    return Request.CreateResponse(dt);
+                }
+                catch (Exception ex)
+                {
+                    return Request.CreateResponse(ex.Message);
+                }
+            }
+        }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("api/SaveRegistrationData")]
-        public HttpResponseMessage SaveRegistrationData()
+        public HttpResponseMessage SaveRegistrationData([FromBody]UserProfileData userProfileData)
         {
             DataSet dtResult = new DataSet();
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -66,10 +100,10 @@ namespace WebApi.Controllers
                         CommandTimeout = 0,
                         CommandText = "saveUserData"
                     };
-                    cmd.Parameters.AddWithValue("@Username", "kml");
-                    cmd.Parameters.AddWithValue("@Password", "kml123");
-                    cmd.Parameters.AddWithValue("@EmailAddress", "kml@gmail.com");
-                    cmd.Parameters.AddWithValue("@PhoneNumber", "908080");
+                    cmd.Parameters.AddWithValue("@Username", userProfileData.UserName);
+                    cmd.Parameters.AddWithValue("@Password", userProfileData.Password);
+                    cmd.Parameters.AddWithValue("@EmailAddress", userProfileData.EmailID);
+                    cmd.Parameters.AddWithValue("@PhoneNumber", userProfileData.PhoneNumber);
                     SqlDataAdapter sda = new SqlDataAdapter
                     {
                         SelectCommand = cmd
