@@ -11,15 +11,15 @@ using WebApi.Models;
 
 namespace WebApi.Controllers
 {
-    public class ProfileController : ApiController
+    public class CartController : ApiController
     {
         string ConnectionString = ConfigurationManager.
-           ConnectionStrings["MyDBConnectionString"].ConnectionString;
+        ConnectionStrings["MyDBConnectionString"].ConnectionString;
 
-        // GET: api/Registration
+        // GET: api/getCartData
         [HttpPost]
-        [Route("api/GetProfileData")]
-        public HttpResponseMessage GetProfileData([FromBody] UserProfileData userProfileData)
+        [Route("api/getCartData")]
+        public HttpResponseMessage GetProfileData([FromBody] Cart cartData)
         {
             DataTable dtResult = new DataTable();
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -31,10 +31,10 @@ namespace WebApi.Controllers
                     {
                         Connection = connection,
                         CommandType = CommandType.StoredProcedure,
-                        CommandTimeout = 0,
-                        CommandText = "getProfileData"
+                        CommandTimeout = 10,
+                        CommandText = "getCartMedecine"
                     };
-                    cmd.Parameters.AddWithValue("@UserName", userProfileData.UserName);
+                    cmd.Parameters.AddWithValue("@serchText", "'%"+cartData.SearchText + "%'");
                     SqlDataAdapter sda = new SqlDataAdapter
                     {
                         SelectCommand = cmd
@@ -49,11 +49,11 @@ namespace WebApi.Controllers
             }
         }
 
-        // GET: api/Registration
         [HttpPost]
-        [Route("api/UpdateProfileData")]
-        public HttpResponseMessage UpdateProfileData([FromBody] UserProfileData userProfileData)
+        [Route("api/saveCartData")]
+        public HttpResponseMessage saveCartData([FromBody] Cart cartData)
         {
+            DataTable dtResult = new DataTable();
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
                 try
@@ -63,17 +63,18 @@ namespace WebApi.Controllers
                     {
                         Connection = connection,
                         CommandType = CommandType.StoredProcedure,
-                        CommandTimeout = 0,
-                        CommandText = "UpdateProfileData"
+                        CommandTimeout = 10,
+                        CommandText = "SaveUserCartData"
                     };
-                    cmd.Parameters.AddWithValue("@UserID", userProfileData.UserID);
-                    cmd.Parameters.AddWithValue("@UserName", userProfileData.UserName);
-                    cmd.Parameters.AddWithValue("@Password", userProfileData.Password);
-                    cmd.Parameters.AddWithValue("@Email", userProfileData.EmailID);
-                    cmd.Parameters.AddWithValue("@Phone", userProfileData.PhoneNumber);
-                    cmd.ExecuteNonQuery();
-                    connection.Close();
-                    return Request.CreateResponse(HttpStatusCode.OK);
+                    cmd.Parameters.AddWithValue("@MedicineID", cartData.MedicineID);
+                    cmd.Parameters.AddWithValue("@UserName", cartData.UserName);
+                    cmd.Parameters.AddWithValue("@Quantity", cartData.Quantity);
+                    SqlDataAdapter sda = new SqlDataAdapter
+                    {
+                        SelectCommand = cmd
+                    };
+                    sda.Fill(dtResult);
+                    return Request.CreateResponse(HttpStatusCode.OK, dtResult);
                 }
                 catch (Exception ex)
                 {

@@ -4,6 +4,7 @@ namespace WebApi.Models
 {
     public class UserProfileData
     {
+        public string SearchText { get; set; }
         public int UserID { get; set; }
         public string UserName { get; set; }
         public string FristName { get; set; }
