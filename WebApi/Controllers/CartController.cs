@@ -83,5 +83,103 @@ namespace WebApi.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/CartBilling")]
+        public HttpResponseMessage CartBilling([FromBody] Cart cartData)
+        {
+            DataTable dtResult = new DataTable();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    SqlCommand cmd = new SqlCommand
+                    {
+                        Connection = connection,
+                        CommandType = CommandType.StoredProcedure,
+                        CommandTimeout = 10,
+                        CommandText = "cartBilling"
+                    }; 
+                    cmd.Parameters.AddWithValue("@UserName", cartData.UserName);
+                    SqlDataAdapter sda = new SqlDataAdapter
+                    {
+                        SelectCommand = cmd
+                    };
+                    sda.Fill(dtResult);
+                    return Request.CreateResponse(HttpStatusCode.OK, dtResult);
+                }
+                catch (Exception ex)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            }
+        }
+
+        [HttpPost]
+        [Route("api/updateCartData")]
+        public HttpResponseMessage updateCartData([FromBody] Cart cartData)
+        {
+            DataTable dtResult = new DataTable();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    SqlCommand cmd = new SqlCommand
+                    {
+                        Connection = connection,
+                        CommandType = CommandType.StoredProcedure,
+                        CommandTimeout = 10,
+                        CommandText = "UpdateCartData"
+                    };
+                    cmd.Parameters.AddWithValue("@MedicineID", cartData.MedicineID);
+                    cmd.Parameters.AddWithValue("@UserName", cartData.UserName);
+                    cmd.Parameters.AddWithValue("@Quantity", cartData.Quantity);
+                    SqlDataAdapter sda = new SqlDataAdapter
+                    {
+                        SelectCommand = cmd
+                    };
+                    sda.Fill(dtResult);
+                    return Request.CreateResponse(HttpStatusCode.OK, dtResult);
+                }
+                catch (Exception ex)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            }
+        }
+
+        [HttpPost]
+        [Route("api/removeCartData")]
+        public HttpResponseMessage removeCartData([FromBody] Cart cartData)
+        {
+            DataTable dtResult = new DataTable();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    SqlCommand cmd = new SqlCommand
+                    {
+                        Connection = connection,
+                        CommandType = CommandType.StoredProcedure,
+                        CommandTimeout = 10,
+                        CommandText = "RemoveCartData"
+                    };
+                    cmd.Parameters.AddWithValue("@MedicineID", cartData.MedicineID);
+                    cmd.Parameters.AddWithValue("@UserName", cartData.UserName);
+                    SqlDataAdapter sda = new SqlDataAdapter
+                    {
+                        SelectCommand = cmd
+                    };
+                    sda.Fill(dtResult);
+                    return Request.CreateResponse(HttpStatusCode.OK, dtResult);
+                }
+                catch (Exception ex)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            }
+        }
     }
 }
